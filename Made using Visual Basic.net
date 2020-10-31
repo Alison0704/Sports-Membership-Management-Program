@@ -1,0 +1,227 @@
+Module Module1
+    Dim newnum As Integer
+    Dim ID, name, email, mthjoined, active As String
+    Dim info1 As String
+    Dim info2 As String
+    Dim info3 As String
+    Function choice() As Integer
+        Dim num As Integer
+        Console.WriteLine("**************************************************")
+        Console.WriteLine("--------------Would you like to:------------------")
+        Console.WriteLine("---------------1.Add a new member?----------------")
+        Console.WriteLine("---------------2.Search a member?-----------------")
+        Console.WriteLine("--3.Which membership will end in a given month?---")
+        Console.WriteLine("**************************************************")
+        Console.WriteLine()
+        Console.Write("Enter the number of your choice:")
+        Do Until num > 0 And num < 4
+            num = Console.ReadLine
+            If num < 1 Or num > 3 Then
+                Console.WriteLine("This choice number is not given")
+            End If
+        Loop
+        choice = num
+    End Function
+    Sub add_a_member()
+        Dim monthnum As Integer
+        Dim found1, found2 As Boolean
+        Dim j As Integer
+        '---------------------------------------------------------------------------
+        ID = ""
+        Console.WriteLine("Enter membership ID")
+        Do Until Len(ID) = 4
+            ID = Console.ReadLine
+            If Len(ID) <> 4 Then
+                Console.WriteLine("Invalid ID length.Try again!")
+            End If
+        Loop
+        '---------------------------------------------------------------------------
+        name = ""
+        While name = ""
+            Console.WriteLine("Enter name")
+            name = Console.ReadLine
+        End While
+        '----------------------------------------------------------------------------
+        Console.WriteLine("Enter email")
+        email = Console.ReadLine
+        Do Until found1 = True And found2 = True
+            If Right(email, 4) <> ".com" Then
+                Console.WriteLine("Please add '.com' at the end of the email")
+                email = Console.ReadLine
+            Else
+                found1 = True
+            End If
+            For j = 1 To Len(email)
+                If Mid(email, j, 1) = "@" Then
+                    found2 = True
+                End If
+            Next j
+            If found2 = False Then
+                Console.WriteLine("Please add '@' in the email")
+                email = Console.ReadLine
+            End If
+        Loop
+        '----------------------------------------------------------------------------
+        mthjoined = ""
+        Do Until mthjoined <> "" And (monthnum > 0 And monthnum < 13)
+            Console.WriteLine("Enter month joined in 2 digit format")
+            mthjoined = Console.ReadLine
+            monthnum = CInt(mthjoined)
+            If monthnum < 1 Or monthnum > 13 Then
+                Console.WriteLine("This is an non-existing month number")
+            End If
+        Loop
+
+        '---------------------------------------------------------------------------------
+        active = ""
+        Console.WriteLine("Enter membership active")
+        Console.WriteLine("Answer TRUE or FALSE")
+        While active = ""
+            Do Until active = "TRUE" Or active = "FALSE"
+                active = Console.ReadLine
+                If active <> "TRUE" And active <> "FALSE" Then
+                    Console.WriteLine("We do not understand.Please try again!")
+                End If
+            Loop
+        End While
+        FileOpen(1, "C:\Users\Alison\Desktop\FinalInfo.txt", OpenMode.Append)
+        info1 = ID + "/" + name + "/" + email + "/" + mthjoined + "/" + active + "/"
+        Print(1)
+        PrintLine(1, info1)
+        FileClose(1)
+    End Sub
+    Sub search_detail()
+        Dim choice As String
+        Dim flag As Boolean
+        Dim entername, finalemail As String
+        Dim x, y As Integer
+        Dim searchID As Integer
+        Flag = False
+        x = 7
+        entername = ""
+        name = ""
+        finalemail = ""
+        choice = ""
+        Console.WriteLine("Will you use the name or the ID for the search?")
+        choice = Console.ReadLine
+        Select Case choice
+            Case "ID"
+                Console.Write("Enter ID:")
+                searchID = Console.ReadLine()
+            Case "name"
+                Console.Write("Enter name:")
+                entername = Console.ReadLine
+        End Select
+        Select Case choice
+            Case "name"
+                FileOpen(1, "C:\Users\Alison\Desktop\FinalInfo.txt", OpenMode.Input)
+                Do Until EOF(1)
+                    info2 = LineInput(1)
+                    name = Mid(info2, 6, 1)
+                    Do Until Mid(info2, x, 1) = "/"
+                        name = name + Mid(info2, x, 1)
+                        x = x + 1
+                    Loop
+                    If name = entername Then
+                        Flag = True
+                        y = x + 1
+                        email = Mid(info2, y, 1)
+                        Do Until Mid(info2, y, 1) = "/"
+                            email = email + Mid(info2, y + 1, 1)
+                            y = y + 1
+                        Loop
+                        finalemail = Left(email, Len(email) - 1)
+                    Else
+                        x = 7
+                    End If
+                Loop
+                FileClose(1)
+            Case "ID"
+                FileOpen(1, "C:\Users\Alison\Desktop\FinalInfo.txt", OpenMode.Input)
+                Do Until EOF(1)
+                    info2 = LineInput(1)
+
+                    ID = Left(info2, 4)
+                    If CInt(ID) = searchID Then
+                        Flag = True
+                        name = Mid(info2, 6, 1)
+                        Do Until Mid(info2, x, 1) = "/"
+                            name = name + Mid(info2, x, 1)
+                            x = x + 1
+                        Loop
+                        y = x + 1
+                        email = Mid(info2, y, 1)
+                        Do Until Mid(info2, y, 1) = "/"
+                            email = email + Mid(info2, y + 1, 1)
+                            y = y + 1
+                        Loop
+                        finalemail = Left(email, Len(email) - 1)
+                    End If
+                Loop
+                FileClose(1)
+        End Select
+        If Flag = False And choice = "ID" Then
+            Console.WriteLine("Sorry, the ID you are looking for is not registered")
+        End If
+        If Flag = False And choice = "name" Then
+            Console.WriteLine("Sorry, the name you are looking for is not registered")
+        End If
+        If Flag = True And choice = "ID" Then
+            Console.WriteLine("Name:" + name)
+            Console.WriteLine("Email:" + finalemail)
+        End If
+        If Flag = True And choice = "name" Then
+            Console.WriteLine("Name:" + entername)
+            Console.WriteLine("Email:" + finalemail)
+        End If
+        Console.ReadKey()
+
+    End Sub
+    Sub Output_members()
+        Dim infoneed As String
+        Dim entermonth As String
+        Dim monthfound As String
+        Dim x As Integer
+        Dim flag As Boolean
+        x = 7
+        flag = False
+        Console.WriteLine("Enter month")
+        entermonth = Console.ReadLine
+
+        FileOpen(1, "C:\Users\Alison\Desktop\FinalInfo.txt", OpenMode.Input)
+        Do Until EOF(1)
+            info3 = LineInput(1)
+            infoneed = Left(Right(info3, 9), 8)
+            If Right(infoneed, 4) = "TRUE" Then
+                monthfound = Mid(infoneed, 2, 2)
+            Else
+                monthfound = Mid(infoneed, 1, 2)
+            End If
+            If monthfound = entermonth Then
+                flag = True
+                name = Mid(info3, 6, 1)
+                Do Until Mid(info3, x, 1) = "/"
+                    name = name + Mid(info3, x, 1)
+                    x = x + 1
+                Loop
+
+                Console.WriteLine(name)
+            End If
+            x = 7
+        Loop
+        FileClose(1)
+    End Sub
+    Sub Main()
+        newnum = choice()
+        Select Case newnum
+            Case 1
+                Call add_a_member()
+            Case 2
+                Call search_detail()
+            Case 3
+                Call Output_members()
+        End Select
+        Console.ReadKey()
+    End Sub
+
+End Module
